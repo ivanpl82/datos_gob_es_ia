@@ -6,7 +6,7 @@ Last updated: 2026-06-21
 
 ## Sources scanned
 
-- /home/palan/.config/opencode/skills
+- ~/.config/opencode/skills
 
 ## Contract
 
@@ -18,16 +18,16 @@ Last updated: 2026-06-21
 
 | Skill | Trigger / description | Scope | Path |
 | --- | --- | --- | --- |
-| `branch-pr` | Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review. | user | `/home/palan/.config/opencode/skills/branch-pr/SKILL.md` |
-| `chained-pr` | Trigger: PRs over 400 lines, stacked PRs, review slices. Split oversized changes into chained PRs that protect review focus. | user | `/home/palan/.config/opencode/skills/chained-pr/SKILL.md` |
-| `cognitive-doc-design` | Design docs that reduce cognitive load. Trigger: writing guides, READMEs, RFCs, onboarding, architecture, or review-facing docs. | user | `/home/palan/.config/opencode/skills/cognitive-doc-design/SKILL.md` |
-| `comment-writer` | Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, or GitHub comments. | user | `/home/palan/.config/opencode/skills/comment-writer/SKILL.md` |
-| `go-testing` | Trigger: Go tests, go test coverage, Bubbletea teatest, golden files. Apply focused Go testing patterns. | user | `/home/palan/.config/opencode/skills/go-testing/SKILL.md` |
-| `issue-creation` | Create Gentle AI issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests. | user | `/home/palan/.config/opencode/skills/issue-creation/SKILL.md` |
-| `judgment-day` | Trigger: judgment day, dual review, adversarial review, juzgar. Run blind dual review, fix confirmed issues, then re-judge. | user | `/home/palan/.config/opencode/skills/judgment-day/SKILL.md` |
-| `skill-creator` | Trigger: new skills, agent instructions, documenting AI usage patterns. Create LLM-first skills with valid frontmatter. | user | `/home/palan/.config/opencode/skills/skill-creator/SKILL.md` |
-| `skill-improver` | Trigger: improve skills, audit skills, refactor skills, skill quality. Audit and upgrade existing LLM-first skills. | user | `/home/palan/.config/opencode/skills/skill-improver/SKILL.md` |
-| `work-unit-commits` | Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code. | user | `/home/palan/.config/opencode/skills/work-unit-commits/SKILL.md` |
+| `branch-pr` | Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review. | user | `~/.config/opencode/skills/branch-pr/SKILL.md` |
+| `chained-pr` | Trigger: PRs over 400 lines, stacked PRs, review slices. Split oversized changes into chained PRs that protect review focus. | user | `~/.config/opencode/skills/chained-pr/SKILL.md` |
+| `cognitive-doc-design` | Design docs that reduce cognitive load. Trigger: writing guides, READMEs, RFCs, onboarding, architecture, or review-facing docs. | user | `~/.config/opencode/skills/cognitive-doc-design/SKILL.md` |
+| `comment-writer` | Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, or GitHub comments. | user | `~/.config/opencode/skills/comment-writer/SKILL.md` |
+| `go-testing` | Trigger: Go tests, go test coverage, Bubbletea teatest, golden files. Apply focused Go testing patterns. | user | `~/.config/opencode/skills/go-testing/SKILL.md` |
+| `issue-creation` | Create Gentle AI issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests. | user | `~/.config/opencode/skills/issue-creation/SKILL.md` |
+| `judgment-day` | Trigger: judgment day, dual review, adversarial review, juzgar. Run blind dual review, fix confirmed issues, then re-judge. | user | `~/.config/opencode/skills/judgment-day/SKILL.md` |
+| `skill-creator` | Trigger: new skills, agent instructions, documenting AI usage patterns. Create LLM-first skills with valid frontmatter. | user | `~/.config/opencode/skills/skill-creator/SKILL.md` |
+| `skill-improver` | Trigger: improve skills, audit skills, refactor skills, skill quality. Audit and upgrade existing LLM-first skills. | user | `~/.config/opencode/skills/skill-improver/SKILL.md` |
+| `work-unit-commits` | Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code. | user | `~/.config/opencode/skills/work-unit-commits/SKILL.md` |
 
 ## Loading protocol
 
