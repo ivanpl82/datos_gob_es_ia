@@ -249,11 +249,17 @@ fi
 mkdir -p "$SKILL_DEST"
 
 if [ -f "$SKILL_DEST/SKILL.md" ]; then
-    warn "Sobrescribiendo skill existente en $SKILL_DEST/SKILL.md"
+    if cmp -s "$SKILL_SRC" "$SKILL_DEST/SKILL.md"; then
+        info "Skill ya actualizada — sin cambios en $SKILL_DEST/SKILL.md"
+    else
+        warn "Cambios detectados — actualizando skill en $SKILL_DEST/SKILL.md..."
+        cp "$SKILL_SRC" "$SKILL_DEST/SKILL.md"
+        info "Skill actualizada"
+    fi
+else
+    cp "$SKILL_SRC" "$SKILL_DEST/SKILL.md"
+    info "Skill instalada en $SKILL_DEST/SKILL.md"
 fi
-
-cp "$SKILL_SRC" "$SKILL_DEST/SKILL.md"
-info "Skill instalada en $SKILL_DEST/SKILL.md"
 
 # --------------------------------------------------------------
 # 4. Actualizar registro de skills
