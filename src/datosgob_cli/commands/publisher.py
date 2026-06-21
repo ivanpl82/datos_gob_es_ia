@@ -41,13 +41,25 @@ def publisher_list(ctx: click.Context) -> None:
 @click.argument("publisher_id")
 @click.pass_context
 def publisher_get(ctx: click.Context, publisher_id: str) -> None:
-    """Obtiene un publicador por su ID."""
+    """Obtiene un publicador por su ID.
+
+    Realiza una unica peticion ``_fetch_page`` y extrae el
+    primer item de ``result["items"]``. No itera paginacion
+    porque busca un solo resultado.
+
+    Si ``result`` no tiene ``items`` o esta vacio, devuelve ``{}``.
+    """
     client: APIClient = ctx.obj["client"]
 
     try:
-        for page in client.paginate(f"catalog/publisher/{publisher_id.lstrip('/')}"):
-            click.echo(format_json(page))
-            return
+        response = client._fetch_page(
+            f"catalog/publisher/{publisher_id.lstrip('/')}",
+            {},
+        )
+        page_data = response.get("result", {})
+        items = page_data.get("items", [])
+        item = items[0] if items else {}
+        click.echo(format_json(item))
     except Exception as exc:
         click.echo(f"Error al obtener publicador: {exc}", err=True)
         raise click.Abort() from exc

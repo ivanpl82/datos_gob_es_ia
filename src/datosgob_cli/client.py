@@ -62,6 +62,10 @@ class APIClient:
 
         Cada yield produce una pagina completa (lista de items).
         Espera 0.5s entre peticiones para respetar rate-limiting.
+
+        Nota: La API de datos.gob.es (linked-data-api v0.2) devuelve
+        ``{"format": ..., "version": ..., "result": {"items": [...], "next": ...}}``.
+        ``items`` y ``next`` estan dentro de ``result``, no en la raiz.
         """
         params = dict(params or {})
         params.setdefault("_pageSize", str(self.page_size))
@@ -71,11 +75,12 @@ class APIClient:
             params["_page"] = str(page)
             data = self._fetch_page(endpoint, params)
 
-            items = data.get("items", data.get("result", []))
+            result_data = data.get("result", {})
+            items = result_data.get("items", [])
             if items:
                 yield items
 
-            if "next" not in data:
+            if "next" not in result_data:
                 break
 
             time.sleep(0.5)

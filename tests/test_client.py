@@ -8,6 +8,8 @@ sobre el codigo real.
 """
 
 import sys
+from unittest.mock import MagicMock, patch
+
 sys.path.insert(0, "src")
 
 from datosgob_cli.client import APIClient
@@ -38,6 +40,164 @@ def test_client_page_size_capped() -> None:
     """El page_size maximo esta limitado a 50."""
     client = APIClient(page_size=100)
     assert client.page_size == 50
+
+
+# === NUEVOS TESTS (paginacion corregida) ===
+
+
+def test_paginate_extracts_items_from_result():
+    """paginate() extrae items de data.result.items."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {
+            "_about": "http://datos.gob.es/apidata/catalog/dataset.json?_pageSize=2&_page=1",
+            "items": [
+                {"title": "Dataset 1", "description": "Desc 1"},
+                {"title": "Dataset 2", "description": "Desc 2"},
+            ],
+            "itemsPerPage": 2,
+            "page": 1,
+        }
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", return_value=mock_response):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 1
+    assert len(pages[0]) == 2
+    assert pages[0][0]["title"] == "Dataset 1"
+
+
+def test_paginate_handles_next_in_result():
+    """paginate() detecta next dentro de data.result para continuar paginando."""
+    responses = [
+        MagicMock(**{
+            "json.return_value": {
+                "format": "linked-data-api",
+                "version": "0.2",
+                "result": {
+                    "items": [{"title": "Page 1"}],
+                    "next": "http://datos.gob.es/page2",
+                }
+            },
+            "raise_for_status.return_value": None,
+        }),
+        MagicMock(**{
+            "json.return_value": {
+                "format": "linked-data-api",
+                "version": "0.2",
+                "result": {
+                    "items": [{"title": "Page 2"}],
+                }
+            },
+            "raise_for_status.return_value": None,
+        }),
+    ]
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", side_effect=responses):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 2
+    assert pages[0][0]["title"] == "Page 1"
+    assert pages[1][0]["title"] == "Page 2"
+
+
+def test_paginate_empty_result():
+    """paginate() no falla cuando data no tiene result."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"format": "linked-data-api", "version": "0.2"}
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", return_value=mock_response):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 0
+
+
+def test_paginate_no_items_in_result():
+    """paginate() devuelve pagina vacia cuando result no tiene items."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {"items": []}
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", return_value=mock_response):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 0
+
+
+def test_paginate_last_page():
+    """paginate() corta cuando result no tiene next (ultima pagina)."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {
+            "items": [{"title": "Unico dataset"}],
+        }
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", return_value=mock_response):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 1
+    assert pages[0][0]["title"] == "Unico dataset"
+
+
+def test_publisher_get_extracts_first_item():
+    """_fetch_page + extraccion de result.items funciona correctamente."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {
+            "items": [{"title": "Pub 1", "id": "/id/123"}],
+        }
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient()
+    with patch.object(client._session, "get", return_value=mock_response):
+        response = client._fetch_page("catalog/publisher/123", {})
+        page_data = response.get("result", {})
+        items = page_data.get("items", [])
+        item = items[0] if items else {}
+
+    assert item["title"] == "Pub 1"
+    assert item["id"] == "/id/123"
+
+
+def test_publisher_get_nonexistent_returns_empty():
+    """publisher_get con ID no existente devuelve {}."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {"items": []}
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient()
+    with patch.object(client._session, "get", return_value=mock_response):
+        response = client._fetch_page("catalog/publisher/9999", {})
+        page_data = response.get("result", {})
+        items = page_data.get("items", [])
+        item = items[0] if items else {}
+
+    assert item == {}
 
 
 if __name__ == "__main__":
