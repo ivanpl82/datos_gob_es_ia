@@ -1,3 +1,12 @@
+---
+name: datosgob
+description: "CLI para la API de datos.gob.es. Trigger: datos del gobierno español, datos.gob.es, datos abiertos de España, datasets, distribuciones, publicadores, temas, coberturas geográficas, NTI."
+license: MIT
+metadata:
+  author: ivanpl82
+  version: "0.1.0"
+---
+
 # SKILL: datosgob — CLI para la API de datos.gob.es
 
 ## Metadata

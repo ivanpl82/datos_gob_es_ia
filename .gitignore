@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Skill registry local cache (regenerado por install.sh en cada máquina)
+.atl/
