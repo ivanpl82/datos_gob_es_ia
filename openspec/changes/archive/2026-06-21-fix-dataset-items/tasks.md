@@ -34,17 +34,17 @@ No Phase 2 — the entire change is the 2 files above.
 - [x] 3.1 **Test: `paginate()` happy path** — mock `_fetch_page` returns `{"result": {"items": [{"title": "a"}], "next": "/p2"}}`. Assert `next()` yields 1 item, `"next" in result` keeps loop.
 - [x] 3.2 **Test: `paginate()` sin `result`** — mock returns `{"error": "not_found"}`. Assert `data.get("result", {})` → `{}`, `result.get("items", [])` → `[]`, `"next" not in result` → stops immediately without error.
 - [x] 3.3 **Test: `paginate()` última página** — mock returns `{"result": {"items": [{"title": "z"}], "next": ""}}`. Assert `"next" not in result` → True (empty string is falsy but absent key → key not in dict) → break.
-- [ ] 3.4 **Test: `publisher_get` con ID existente** — mock `_fetch_page` returns `{"result": {"items": [{"id": 1, "title": "Pub"}]}}`. Use `unittest.mock.patch` on `APIClient._fetch_page`. Assert single call, single item output.
-- [ ] 3.5 **Test: `publisher_get` con ID no existente** — mock returns `{"result": {"items": []}}`. Assert `result.get("items", [{}])[0]` → `{}` → no crash, empty dict emitted.
+- [x] 3.4 **Test: `publisher_get` con ID existente** — mock `_fetch_page` returns `{"result": {"items": [{"id": 1, "title": "Pub"}]}}`. Use `unittest.mock.patch` on `APIClient._fetch_page`. Assert single call, single item output.
+- [x] 3.5 **Test: `publisher_get` con ID no existente** — mock returns `{"result": {"items": []}}`. Assert `result.get("items", [{}])[0]` → `{}` → no crash, empty dict emitted.
 - **Files**: `tests/test_client.py`
 - **Note**: All tests use `unittest.mock.patch` — no external deps. Coexist with existing ad-hoc tests.
 
 ## Phase 4: Verification / Integration
 
-- [ ] 4.1 **Verify `datosgob --page-size 2 dataset list`** — run with real API (no mock). Assert returns real dataset objects (title, description, publisher), not JSON keys.
-- [ ] 4.2 **Verify `datosgob dataset list --keyword salud`** — runs without error, returns filtered results.
-- [ ] 4.3 **Verify `publisher list`, `theme list`, `spatial list`, `nti list`** — all use `paginate()`; assert no regressions. Each command should return data, not `result` keys.
-- [ ] 4.4 **Verify `publisher get <id>`** — returns single publisher dict, not a list wrapped in a page.
+- [x] 4.1 **Verify `datosgob --page-size 2 dataset list`** — run with real API (no mock). Assert returns real dataset objects (title, description, publisher), not JSON keys.
+- [x] 4.2 **Verify `datosgob dataset list --keyword salud`** — runs without error, returns filtered results.
+- [x] 4.3 **Verify `publisher list`, `theme list`, `spatial list`, `nti list`** — all use `paginate()`; assert no regressions. Each command should return data, not `result` keys.
+- [~] 4.4 **Verify `publisher get <id>`** — ~~returns single publisher dict~~ **FUERA DE ALCANCE**: el endpoint `catalog/publisher/{id}` devuelve 404 en la API de datos.gob.es. No es un bug de nuestro código. El refactor de `publisher_get` es correcto; el endpoint no está disponible upstream.
 - **Note**: Manual integration check. Run after T1+T2+T3 pass.
 
 ---

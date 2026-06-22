@@ -1,8 +1,9 @@
 """Comando dataset: consulta datasets de datos.gob.es.
 
 Uso: datosgob dataset list [OPCIONES]
+     datosgob dataset get <identifier>
 
-Filtros disponibles:
+Filtros disponibles en list:
   --theme, --publisher, --keyword, --spatial,
   --resource-format, --modified-begin, --modified-end,
   --issued-begin, --issued-end
@@ -97,7 +98,7 @@ def dataset_list(
 
     try:
         all_items: list[dict] = []
-        for page in client.paginate("catalog/dataset", params):
+        for page in client.paginate("catalog/dataset.json", params):
             all_items.extend(page)
     except Exception as exc:
         click.echo(f"Error al consultar datasets: {exc}", err=True)
@@ -120,3 +121,32 @@ def _emit_output(
         click.echo(format_csv(items))
     else:
         click.echo(format_json(items))
+
+
+@dataset_group.command(name="get")
+@click.argument("identifier")
+@click.pass_context
+def dataset_get(ctx: click.Context, identifier: str) -> None:
+    """Obtiene un dataset individual por su identifier (UUID).
+
+    El identifier aparece en los campos ``identifier`` o ``_about``
+    de la respuesta de ``dataset list``.
+
+    Ejemplo:
+
+      datosgob dataset get b0da07b8-a123-4abc-9def-0123456789ab
+    """
+    client: APIClient = ctx.obj["client"]
+
+    try:
+        response = client._fetch_page(
+            f"catalog/dataset/{identifier}.json",
+            {},
+        )
+        page_data = response.get("result", {})
+        items = page_data.get("items", [])
+        item = items[0] if items else {}
+        click.echo(format_json(item))
+    except Exception as exc:
+        click.echo(f"Error al obtener dataset: {exc}", err=True)
+        raise click.Abort() from exc

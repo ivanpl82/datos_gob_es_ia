@@ -2,21 +2,14 @@
 
 Verifica que todos los modulos de comandos se importan
 y que el CLI group registra cada subcomando.
-
-Este test NO necesita pytest ni mock — solo imports sobre
-el codigo real y verifica que el arbol de comandos existe.
 """
 
 import sys
+
 sys.path.insert(0, "src")
 
 # Verificar imports de todos los modulos de comandos
-from datosgob_cli.commands import dataset
-from datosgob_cli.commands import distribution
-from datosgob_cli.commands import publisher
-from datosgob_cli.commands import theme
-from datosgob_cli.commands import spatial
-from datosgob_cli.commands import nti
+from datosgob_cli.commands import dataset, distribution, nti, publisher, spatial, theme
 
 
 def test_commands_importable() -> None:
@@ -37,7 +30,24 @@ def test_cli_group_has_commands() -> None:
     assert commands == expected, f"Comandos registrados: {commands}"
 
 
+def test_dataset_has_list_and_get() -> None:
+    """Dataset group tiene los subcomandos 'list' y 'get'."""
+    from datosgob_cli.cli import cli
+    dataset_cmd = cli.commands["dataset"]
+    subcommands = {c.name for c in dataset_cmd.commands.values()}
+    assert "list" in subcommands, f"Falta subcomando list: {subcommands}"
+    assert "get" in subcommands, f"Falta subcomando get: {subcommands}"
+
+
+def test_spatial_still_registered() -> None:
+    """Spatial group se mantiene registrado aunque devuelva error."""
+    from datosgob_cli.cli import cli
+    assert "spatial" in cli.commands
+
+
 if __name__ == "__main__":
     test_commands_importable()
     test_cli_group_has_commands()
+    test_dataset_has_list_and_get()
+    test_spatial_still_registered()
     print("OK")

@@ -66,11 +66,13 @@ class APIClient:
         Nota: La API de datos.gob.es (linked-data-api v0.2) devuelve
         ``{"format": ..., "version": ..., "result": {"items": [...], "next": ...}}``.
         ``items`` y ``next`` estan dentro de ``result``, no en la raiz.
+
+        La paginacion empieza en ``_page=0`` (no en 1).
         """
         params = dict(params or {})
         params.setdefault("_pageSize", str(self.page_size))
 
-        page = 1
+        page = 0  # <-- la API empieza en 0, no en 1
         while True:
             params["_page"] = str(page)
             data = self._fetch_page(endpoint, params)

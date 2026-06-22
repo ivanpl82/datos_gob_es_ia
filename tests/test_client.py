@@ -200,6 +200,60 @@ def test_publisher_get_nonexistent_returns_empty():
     assert item == {}
 
 
+def test_dataset_get_extracts_first_item():
+    """dataset get extrae el primer item de result.items."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "format": "linked-data-api",
+        "version": "0.2",
+        "result": {
+            "items": [{"title": "Dataset 1", "identifier": [{"_value": "abc-123", "_lang": "es"}]}],
+        }
+    }
+    mock_response.raise_for_status = MagicMock()
+
+    client = APIClient()
+    with patch.object(client._session, "get", return_value=mock_response):
+        response = client._fetch_page("catalog/dataset/abc-123.json", {})
+        page_data = response.get("result", {})
+        items = page_data.get("items", [])
+        item = items[0] if items else {}
+
+    assert item["title"] == "Dataset 1"
+    assert item["identifier"][0]["_value"] == "abc-123"
+
+
+def test_paginate_starts_at_page_0():
+    """paginate() usa _page=0 como primera pagina."""
+    call_count = 0
+
+    def mock_get(url, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        mock = MagicMock()
+        body = {
+            "format": "linked-data-api",
+            "version": "0.2",
+            "result": {
+                "items": [{"title": f"Page {call_count - 1}"}],
+            }
+        }
+        # solo la primera pagina tiene next
+        if call_count < 2:
+            body["result"]["next"] = f"http://datos.gob.es/page{call_count}"
+        mock.json.return_value = body
+        mock.raise_for_status = MagicMock()
+        return mock
+
+    client = APIClient(page_size=2)
+    with patch.object(client._session, "get", side_effect=mock_get):
+        pages = list(client.paginate("catalog/dataset.json"))
+
+    assert len(pages) == 2
+    assert pages[0][0]["title"] == "Page 0"  # <-- confirma _page=0
+    assert pages[1][0]["title"] == "Page 1"
+
+
 if __name__ == "__main__":
     test_client_exists()
     test_client_session()
